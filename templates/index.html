@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>eFarmerID - Lagos Farmer Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --secondary-green: #218838;
+            --dark-green: #1e7e34;
+            --light-green: #d4edda;
+            --accent-blue: #17a2b8;
+            --agent-orange: #fd7e14;
+            --offline-red: #dc3545;
+            --biometric-purple: #6f42c1;
+            --highlight-yellow: #fff3cd;
+            --lagos-blue: #0077c0;
+            --lagos-yellow: #f9a01b;
+        }
+        
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 80px;
+        }
+        
+        .lagos-header {
+            background: linear-gradient(135deg, var(--lagos-blue) 0%, var(--lagos-blue) 70%, var(--lagos-yellow) 70%, var(--lagos-yellow) 100%);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .agent-status {
+            background-color: var(--light-green);
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .agent-status.offline {
+            background-color: #f8d7da;
+            color: var(--offline-red);
+        }
+        
+        .capture-card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .capture-card-header {
+            background-color: var(--lagos-blue);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .biometric-header {
+            background-color: var(--biometric-purple) !important;
+        }
+        
+        .section-title {
+            border-left: 4px solid var(--lagos-yellow);
+            padding-left: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: var(--offline-red);
+        }
+        
+        .form-photo-preview {
+            width: 140px;
+            height: 140px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px dashed #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: #f9f9f9;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-photo-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+        
+        .gps-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            background-color: #e9ecef;
+            transition: all 0.3s;
+        }
+        
+        .gps-status.active {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+        
+        .gps-status.inactive {
+            background-color: #f8d7da;
+            color: var(--offline-red);
+        }
+        
+        .progress-thin {
+            height: 8px;
+            border-radius: 4px;
+        }
+        
+        .bi-check-circle-fill {
+            color: var(--primary-green);
+        }
+        
+        .bi-exclamation-triangle-fill {
+            color: var(--offline-red);
+        }
+        
+        .offline-warning {
+            background-color: var(--highlight-yellow);
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 4px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--lagos-yellow);
+            box-shadow: 0 0 0 0.25rem rgba(249, 160, 27, 0.25);
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-lagos {
+            background-color: var(--lagos-blue);
+            border-color: var(--lagos-blue);
+            color: white;
+        }
+        
+        .btn-lagos:hover {
+            background-color: #0062a3;
+            border-color: #0062a3;
+        }
+        
+        /* Biometric specific styles */
+        .biometric-section {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            border-left: 4px solid var(--biometric-purple);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .biometric-capture {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            height: 200px;
+            justify-content: center;
+        }
+        
+        .biometric-capture:hover {
+            border-color: var(--biometric-purple);
+            background-color: #f8f9ff;
+        }
+        
+        .biometric-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .biometric-status.captured {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+        
+        .biometric-status.pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .biometric-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 5px;
+            object-fit: cover;
+            border: 2px solid #eee;
+        }
+        
+        .fingerprint-preview {
+            width: 80px;
+            height: 80px;
+            background-color: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #eee;
+        }
+        
+        .verification-score {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .score-high {
+            background-color: var(--primary-green);
+        }
+        
+        .score-medium {
+            background-color: #ffc107;
+        }
+        
+        .score-low {
+            background-color: var(--offline-red);
+        }
+        
+        .capture-feedback {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        /* Animation for GPS status */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .gps-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Mobile optimizations */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 10px;
+            z-index: 1000;
+        }
+        
+        .camera-container {
+            width: 100%;
+            height: 300px;
+            background-color: #000;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #videoElement {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .camera-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .capture-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #ddd;
+        }
+        
+        .face-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 250px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .face-guide {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 10;
+        }
+        
+        .lagos-map {
+            height: 300px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 800 400"><rect width="100%" height="100%" fill="%23e9ecef"/><path d="M200,100 Q400,50 600,150 Q700,200 600,250 Q500,300 400,250 Q300,200 200,250 Q100,300 200,100 Z" fill="%230077c0" fill-opacity="0.2" stroke="%230077c0" stroke-width="5"/><circle cx="400" cy="200" r="10" fill="%23dc3545"/><text x="400" y="190" text-anchor="middle" fill="%23333" font-weight="bold">Lagos</text></svg>');
+            background-size: cover;
+        }
+        
+        @media (max-width: 768px) {
+            .form-photo-preview {
+                width: 120px;
+                height: 120px;
+                margin-bottom: 15px;
+            }
+            
+            .lagos-header {
+                padding: 10px 0;
+            }
+            
+            .capture-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .capture-card-header .badge {
+                margin-top: 5px;
+            }
+            
+            .biometric-capture {
+                height: 160px;
+                padding: 15px;
+            }
+            
+            .btn {
+                padding: 10px 16px;
+            }
+            
+            .form-control, .form-select {
+                padding: 10px;
+            }
+            
+            .container {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .face-overlay {
+                width: 150px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Lagos Header -->
+    <header class="lagos-header mb-4">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-tree-fill text-white fs-4 me-2"></i>
+                    <span class="fs-5 fw-bold">eFarmerID Lagos</span>
+                    <span class="badge bg-light text-dark ms-2">Agent Portal</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="me-3 gps-status inactive" id="gpsStatus">
+                        <i class="bi bi-geo-alt-fill me-1"></i>
+                        <span>GPS Inactive</span>
+                    </div>
+                    <div class="agent-status me-3">
+                        <i class="bi bi-wifi"></i> Online
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mb-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <!-- Progress Indicator -->
+                <div class="card capture-card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="mb-1">Lagos State Farmer Registration</h5>
+                                <p class="small text-muted mb-0">Complete all sections to register a new farmer</p>
+                            </div>
+                            <span class="badge bg-primary" id="stepBadge">Step 1 of 4</span>
+                        </div>
+                        <div class="progress progress-thin mb-1">
+                            <div class="progress-bar bg-success" id="progressBar" role="progressbar" style="width: 25%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>Personal Info</span>
+                            <span>Location</span>
+                            <span>Farm Details</span>
+                            <span>Verification</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Personal Information -->
+                <div class="card capture-card" id="personalInfoSection">
+                    <div class="card-header capture-card-header">
+                        <h5 class="mb-0"><i class="bi bi-person me-2"></i> Personal Information</h5>
+                        <span class="badge bg-light text-dark"><i class="bi bi-asterisk me-1"></i>Required Fields</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label required-field">Farmer Photo</label>
+                                <div class="form-photo-preview mb-2" id="photoPreviewContainer">
+                                    <i class="bi bi-camera fs-3 text-muted" id="photoPlaceholder"></i>
+                                    <img id="photoPreview" class="d-none">
+                                    <span class="id-verification-badge d-none" title="ID Verified" id="photoVerifiedBadge">
+                                        <i class="bi bi-check-lg"></i>
+                                    </span>
+                                </div>
+                                <small class="text-muted d-block">Clear face photo required</small>
+                                <button class="btn btn-sm btn-outline-primary mt-2 w-100" id="capturePhotoBtn">
+                                    <i class="bi bi-camera me-1"></i> Capture Photo
+                                </button>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="firstName" class="form-label required-field">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="lastName" class="form-label required-field">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="idNumber" class="form-label required-field">National ID/Passport</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+                                            <input type="text" class="form-control" id="idNumber" placeholder="e.g. 12345678" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="dob" class="form-label">Date of Birth</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                            <input type="date" class="form-control" id="dob">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="gender" class="form-label required-field">Gender</label>
+                                        <select class="form-select" id="gender" required>
+                                            <option value="" selected disabled>Select Gender</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="phone" class="form-label required-field">Phone Number</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                                            <input type="tel" class="form-control" id="phone" placeholder="e.g. 08012345678" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Location Information -->
+                <div class="card capture-card mt-4 d-none" id="locationSection">
+                    <div class="card-header capture-card-header">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt me-2"></i> Location Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex align-items-center mb-2">
+                                    <label class="form-label me-3 mb-0">GPS Coordinates</label>
+                                    <span class="badge bg-danger me-2" id="gpsCaptureBadge"><i class="bi bi-x-circle-fill me-1"></i>Not Captured</span>
+                                    <button class="btn btn-sm btn-outline-primary me-2" id="captureGpsBtn">
+                                        <i class="bi bi-geo-alt me-1"></i> Capture Location
+                                    </button>
+                                </div>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text">Lat</span>
+                                            <input type="text" class="form-control" id="latitude" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <span class="input-group-text">Lng</span>
+                                            <input type="text" class="form-control" id="longitude" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted" id="gpsTimestamp">Location will be captured from your device GPS</small>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="lagos-map mb-3" id="lagosMap"></div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="lga" class="form-label required-field">LGA (Local Government Area)</label>
+                                <select class="form-select" id="lga" required>
+                                    <option value="" selected disabled>Select LGA</option>
+                                    <option>Agege</option>
+                                    <option>Ajeromi-Ifelodun</option>
+                                    <option>Alimosho</option>
+                                    <option>Amuwo-Odofin</option>
+                                    <option>Apapa</option>
+                                    <option>Badagry</option>
+                                    <option>Epe</option>
+                                    <option>Eti-Osa</option>
+                                    <option>Ibeju-Lekki</option>
+                                    <option>Ifako-Ijaiye</option>
+                                    <option>Ikeja</option>
+                                    <option>Ikorodu</option>
+                                    <option>Kosofe</option>
+                                    <option>Lagos Island</option>
+                                    <option>Lagos Mainland</option>
+                                    <option>Mushin</option>
+                                    <option>Ojo</option>
+                                    <option>Oshodi-Isolo</option>
+                                    <option>Shomolu</option>
+                                    <option>Surulere</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="ward" class="form-label">Ward</label>
+                                <input type="text" class="form-control" id="ward" placeholder="Enter ward name">
+                            </div>
+                            <div class="col-12">
+                                <label for="address" class="form-label">Full Address</label>
+                                <textarea class="form-control" id="address" rows="2" placeholder="Enter full address"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Farm Details Section -->
+                <div class="card capture-card mt-4 d-none" id="farmDetailsSection">
+                    <div class="card-header capture-card-header">
+                        <h5 class="mb-0"><i class="bi bi-tree me-2"></i> Farm Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i> Provide accurate information about the farmer's agricultural activities.
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="farmSize" class="form-label required-field">Farm Size (Acres)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="farmSize" step="0.1" min="0" required>
+                                    <span class="input-group-text">acres</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="primaryCrop" class="form-label required-field">Primary Crop</label>
+                                <select class="form-select" id="primaryCrop" required>
+                                    <option value="" selected disabled>Select Primary Crop</option>
+                                    <option>Cassava</option>
+                                    <option>Maize</option>
+                                    <option>Vegetables</option>
+                                    <option>Rice</option>
+                                    <option>Yam</option>
+                                    <option>Plantain</option>
+                                    <option>Tomatoes</option>
+                                    <option>Okra</option>
+                                    <option>Pepper</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="secondaryCrop" class="form-label">Secondary Crop</label>
+                                <select class="form-select" id="secondaryCrop">
+                                    <option value="" selected disabled>Select Secondary Crop</option>
+                                    <option>None</option>
+                                    <option>Cassava</option>
+                                    <option>Maize</option>
+                                    <option>Vegetables</option>
+                                    <option>Rice</option>
+                                    <option>Yam</option>
+                                    <option>Plantain</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="livestock" class="form-label">Livestock</label>
+                                <select class="form-select" id="livestock" multiple>
+                                    <option>Poultry</option>
+                                    <option>Goats</option>
+                                    <option>Sheep</option>
+                                    <option>Fish</option>
+                                    <option>Pigs</option>
+                                    <option>Cattle</option>
+                                    <option>None</option>
+                                </select>
+                                <small class="text-muted">Hold Ctrl to select multiple</small>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="farmingMethods" class="form-label">Farming Methods</label>
+                                <div class="row g-2">
+                                    <div class="col-md-3 col-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="irrigation" name="farmingMethods" value="irrigation">
+                                            <label class="form-check-label" for="irrigation">Irrigation</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="organic" name="farmingMethods" value="organic">
+                                            <label class="form-check-label" for="organic">Organic</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="greenhouse" name="farmingMethods" value="greenhouse">
+                                            <label class="form-check-label" for="greenhouse">Greenhouse</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="conservation" name="farmingMethods" value="conservation">
+                                            <label class="form-check-label" for="conservation">Conservation</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="additionalInfo" class="form-label">Additional Information</label>
+                                <textarea class="form-control" id="additionalInfo" rows="3" placeholder="Any other relevant information about the farm"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Biometric Verification -->
+                <div class="card capture-card mt-4 d-none" id="biometricSection">
+                    <div class="card-header capture-card-header biometric-header">
+                        <h5 class="mb-0"><i class="bi bi-fingerprint me-2"></i> Biometric Verification</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle-fill me-2"></i> Biometric verification helps prevent duplicate registrations and ensures farmer identity.
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="biometric-section">
+                                    <h6 class="section-title">Face Capture</h6>
+                                    <div class="biometric-capture" id="faceCaptureBtn">
+                                        <i class="bi bi-camera fs-1 text-muted mb-2"></i>
+                                        <p class="text-center mb-0">Click to capture facial biometrics</p>
+                                        <div class="capture-feedback text-success small"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="biometric-status pending" id="faceStatus">
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Not Captured
+                                        </span>
+                                        <div class="verification-score score-low d-none" id="faceScore">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="biometric-section">
+                                    <h6 class="section-title">Fingerprint Capture</h6>
+                                    <div class="biometric-capture" id="fingerprintCaptureBtn">
+                                        <i class="bi bi-fingerprint fs-1 text-muted mb-2"></i>
+                                        <p class="text-center mb-0">Click to capture fingerprint</p>
+                                        <div class="capture-feedback text-success small"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <span class="biometric-status pending" id="fingerprintStatus">
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Not Captured
+                                        </span>
+                                        <div class="verification-score score-low d-none" id="fingerprintScore">0%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="biometricConsent" required>
+                            <label class="form-check-label" for="biometricConsent">
+                                I consent to the collection and storage of my biometric data for identification purposes
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Verification Section -->
+                <div class="card capture-card mt-4 d-none" id="verificationSection">
+                    <div class="card-header capture-card-header">
+                        <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i> Verification</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> Please review all information before submission. 
+                            Once verified, changes will require administrative approval.
+                        </div>
+                        
+                        <div class="verification-summary mb-4">
+                            <h6 class="section-title">Registration Summary</h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th width="30%">Farmer Name</th>
+                                            <td id="summaryName">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>ID Number</th>
+                                            <td id="summaryId">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Phone Number</th>
+                                            <td id="summaryPhone">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>LGA</th>
+                                            <td id="summaryLGA">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Farm Size</th>
+                                            <td id="summaryFarmSize">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Primary Crop</th>
+                                            <td id="summaryCrop">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Biometric Status</th>
+                                            <td id="summaryBiometric">-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="verification-checks mb-4">
+                            <h6 class="section-title">Verification Checks</h6>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        Personal Information Complete
+                                    </div>
+                                    <span class="badge bg-success">Verified</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-check-circle-fill text-success me-2" id="locationCheckIcon"></i>
+                                        Location Verified
+                                    </div>
+                                    <span class="badge bg-danger" id="locationCheckStatus">Not Captured</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-check-circle-fill text-success me-2" id="biometricCheckIcon"></i>
+                                        Biometric Verification
+                                    </div>
+                                    <span class="badge bg-danger" id="biometricCheckStatus">Not Complete</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="verification-actions">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="declaration" required>
+                                <label class="form-check-label" for="declaration">
+                                    I certify that all information provided is accurate to the best of my knowledge
+                                </label>
+                            </div>
+                            
+                            <button class="btn btn-lagos w-100" id="submitRegistrationBtn">
+                                <i class="bi bi-check-circle me-2"></i> Submit Registration
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation for Mobile -->
+    <div class="mobile-bottom-nav d-lg-none">
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-outline-secondary" id="prevStepBtn" disabled>
+                <i class="bi bi-arrow-left me-2"></i> Previous
+            </button>
+            <button class="btn btn-lagos" id="nextStepBtn">
+                Next <i class="bi bi-arrow-right ms-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Camera Modal -->
+    <div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cameraModalLabel">Capture Photo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="camera-container">
+                        <video id="videoElement" autoplay playsinline></video>
+                        <canvas id="canvasElement" class="d-none"></canvas>
+                        <div class="face-overlay"></div>
+                        <div class="face-guide">Position your face within the frame</div>
+                    </div>
+                    <div class="camera-controls">
+                        <div class="capture-btn" id="takePhotoBtn">
+                            <i class="bi bi-circle-fill text-white fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h4 class="mb-3">Registration Successful!</h4>
+                    <p class="mb-4">Farmer ID: <strong id="successFarmerId">F-LAG-2023-00456</strong> has been created and assigned.</p>
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-lagos" data-bs-dismiss="modal">
+                            <i class="bi bi-printer me-2"></i> Print ID Card
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="registerAnotherBtn">
+                            <i class="bi bi-plus-circle me-2"></i> Register Another Farmer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variables for current step and sections
+            let currentStep = 1;
+            const sections = [
+                'personalInfoSection',
+                'locationSection',
+                'farmDetailsSection',
+                'biometricSection',
+                'verificationSection'
+            ];
+            
+            // DOM Elements
+            const prevStepBtn = document.getElementById('prevStepBtn');
+            const nextStepBtn = document.getElementById('nextStepBtn');
+            const stepBadge = document.getElementById('stepBadge');
+            const progressBar = document.getElementById('progressBar');
+            const captureGpsBtn = document.getElementById('captureGpsBtn');
+            const gpsStatus = document.getElementById('gpsStatus');
+            const gpsCaptureBadge = document.getElementById('gpsCaptureBadge');
+            const latitudeInput = document.getElementById('latitude');
+            const longitudeInput = document.getElementById('longitude');
+            const gpsTimestamp = document.getElementById('gpsTimestamp');
+            const capturePhotoBtn = document.getElementById('capturePhotoBtn');
+            const photoPreviewContainer = document.getElementById('photoPreviewContainer');
+            const photoPreview = document.getElementById('photoPreview');
+            const photoPlaceholder = document.getElementById('photoPlaceholder');
+            const photoVerifiedBadge = document.getElementById('photoVerifiedBadge');
+            const faceCaptureBtn = document.getElementById('faceCaptureBtn');
+            const fingerprintCaptureBtn = document.getElementById('fingerprintCaptureBtn');
+            const faceStatus = document.getElementById('faceStatus');
+            const fingerprintStatus = document.getElementById('fingerprintStatus');
+            const faceScore = document.getElementById('faceScore');
+            const fingerprintScore = document.getElementById('fingerprintScore');
+            const submitRegistrationBtn = document.getElementById('submitRegistrationBtn');
+            const registerAnotherBtn = document.getElementById('registerAnotherBtn');
+            
+            // Camera elements
+            const cameraModal = new bootstrap.Modal(document.getElementById('cameraModal'));
+            const videoElement = document.getElementById('videoElement');
+            const canvasElement = document.getElementById('canvasElement');
+            const takePhotoBtn = document.getElementById('takePhotoBtn');
+            
+            // Success modal
+            const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            
+            // Initialize steps
+            updateStepVisibility();
+            
+            // Event Listeners
+            prevStepBtn.addEventListener('click', goToPreviousStep);
+            nextStepBtn.addEventListener('click', goToNextStep);
+            captureGpsBtn.addEventListener('click', captureGPSLocation);
+            capturePhotoBtn.addEventListener('click', openCamera);
+            takePhotoBtn.addEventListener('click', takePhoto);
+            faceCaptureBtn.addEventListener('click', captureFaceBiometrics);
+            fingerprintCaptureBtn.addEventListener('click', captureFingerprintBiometrics);
+            submitRegistrationBtn.addEventListener('click', submitRegistration);
+            registerAnotherBtn.addEventListener('click', resetForm);
+            
+            // Step Navigation Functions
+            function goToPreviousStep() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateStepVisibility();
+                }
+            }
+            
+            function goToNextStep() {
+                if (validateCurrentStep()) {
+                    if (currentStep < sections.length) {
+                        currentStep++;
+                        updateStepVisibility();
+                        
+                        // If moving to verification section, update the summary
+                        if (currentStep === 5) {
+                            updateVerificationSummary();
+                        }
+                    }
+                }
+            }
+            
+            function updateStepVisibility() {
+                // Hide all sections
+                sections.forEach(section => {
+                    document.getElementById(section).classList.add('d-none');
+                });
+                
+                // Show current section
+                document.getElementById(sections[currentStep - 1]).classList.remove('d-none');
+                
+                // Update progress
+                const progressPercent = (currentStep / sections.length) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+                stepBadge.textContent = `Step ${currentStep} of ${sections.length}`;
+                
+                // Update buttons
+                prevStepBtn.disabled = currentStep === 1;
+                
+                if (currentStep === sections.length) {
+                    nextStepBtn.classList.add('d-none');
+                } else {
+                    nextStepBtn.classList.remove('d-none');
+                    nextStepBtn.textContent = currentStep === sections.length - 1 ? 'Review' : 'Next';
+                }
+            }
+            
+            function validateCurrentStep() {
+                if (currentStep === 1) {
+                    // Validate personal info
+                    const firstName = document.getElementById('firstName').value;
+                    const lastName = document.getElementById('lastName').value;
+                    const idNumber = document.getElementById('idNumber').value;
+                    const gender = document.getElementById('gender').value;
+                    const phone = document.getElementById('phone').value;
+                    
+                    if (!firstName || !lastName || !idNumber || !gender || !phone) {
+                        alert('Please fill in all required fields');
+                        return false;
+                    }
+                    
+                    if (photoPreview.classList.contains('d-none')) {
+                        alert('Please capture a photo of the farmer');
+                        return false;
+                    }
+                }
+                
+                if (currentStep === 2) {
+                    // Validate location
+                    if (latitudeInput.value === '' || longitudeInput.value === '') {
+                        alert('Please capture GPS location');
+                        return false;
+                    }
+                    
+                    const lga = document.getElementById('lga').value;
+                    if (!lga) {
+                        alert('Please select an LGA');
+                        return false;
+                    }
+                }
+                
+                if (currentStep === 3) {
+                    // Validate farm details
+                    const farmSize = document.getElementById('farmSize').value;
+                    const primaryCrop = document.getElementById('primaryCrop').value;
+                    
+                    if (!farmSize || !primaryCrop) {
+                        alert('Please fill in all required farm details');
+                        return false;
+                    }
+                }
+                
+                if (currentStep === 4) {
+                    // Validate biometrics
+                    if (faceStatus.classList.contains('pending')) {
+                        alert('Please capture face biometrics');
+                        return false;
+                    }
+                    
+                    if (fingerprintStatus.classList.contains('pending')) {
+                        alert('Please capture fingerprint biometrics');
+                        return false;
+                    }
+                    
+                    if (!document.getElementById('biometricConsent').checked) {
+                        alert('Please provide consent for biometric data collection');
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            // GPS Location Functions
+            function captureGPSLocation() {
+                captureGpsBtn.disabled = true;
+                captureGpsBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Capturing...';
+                
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser');
+                    captureGpsBtn.disabled = false;
+                    captureGpsBtn.innerHTML = '<i class="bi bi-geo-alt me-1"></i> Capture Location';
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        // Success callback
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const timestamp = new Date(position.timestamp);
+                        
+                        // Update UI with location data
+                        latitudeInput.value = latitude.toFixed(6);
+                        longitudeInput.value = longitude.toFixed(6);
+                        gpsTimestamp.textContent = `Captured at ${timestamp.toLocaleTimeString()}`;
+                        
+                        // Update status
+                        gpsCaptureBadge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Captured';
+                        gpsCaptureBadge.classList.remove('bg-danger');
+                        gpsCaptureBadge.classList.add('bg-success');
+                        
+                        gpsStatus.innerHTML = '<i class="bi bi-geo-alt-fill me-1"></i> GPS Active';
+                        gpsStatus.classList.remove('inactive');
+                        gpsStatus.classList.add('active', 'gps-pulse');
+                        
+                        // Reset button
+                        captureGpsBtn.disabled = false;
+                        captureGpsBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Recapture';
+                    },
+                    function(error) {
+                        // Error callback
+                        alert(`Error capturing location: ${error.message}`);
+                        captureGpsBtn.disabled = false;
+                        captureGpsBtn.innerHTML = '<i class="bi bi-geo-alt me-1"></i> Capture Location';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            }
+            
+            // Camera Functions
+            let stream = null;
+            
+            function openCamera() {
+                cameraModal.show();
+                
+                // Access the device camera
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    // Try to get front-facing camera
+                    navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'user',
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: false 
+                    })
+                        .then(function(mediaStream) {
+                            stream = mediaStream;
+                            videoElement.srcObject = mediaStream;
+                        })
+                        .catch(function(error) {
+                            console.error('Error accessing camera:', error);
+                            // Try without constraints if facingMode fails
+                            navigator.mediaDevices.getUserMedia({ video: true })
+                                .then(function(mediaStream) {
+                                    stream = mediaStream;
+                                    videoElement.srcObject = mediaStream;
+                                })
+                                .catch(function(error) {
+                                    console.error('Error accessing camera:', error);
+                                    alert('Unable to access camera: ' + error.message);
+                                    cameraModal.hide();
+                                });
+                        });
+                } else {
+                    alert('Your browser does not support camera access');
+                }
+            }
+            
+            function takePhoto() {
+                const context = canvasElement.getContext('2d');
+                
+                // Set canvas dimensions to match video
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
+                
+                // Draw current video frame to canvas
+                context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+                
+                // Convert canvas to data URL
+                const imageData = canvasElement.toDataURL('image/png');
+                
+                // Update preview
+                photoPreview.src = imageData;
+                photoPreview.classList.remove('d-none');
+                photoPlaceholder.classList.add('d-none');
+                photoVerifiedBadge.classList.remove('d-none');
+                
+                // Close camera and stop stream
+                cameraModal.hide();
+                stopCameraStream();
+            }
+            
+            function stopCameraStream() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+            }
+            
+            // Handle modal close event
+            document.getElementById('cameraModal').addEventListener('hidden.bs.modal', function() {
+                stopCameraStream();
+            });
+            
+            // Biometric Functions
+            function captureFaceBiometrics() {
+                faceCaptureBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Capturing...';
+                
+                // Open camera for face capture
+                openCameraForFace();
+            }
+            
+            function openCameraForFace() {
+                cameraModal.show();
+                
+                // Access the device camera
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    // Try to get front-facing camera
+                    navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'user',
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: false 
+                    })
+                        .then(function(mediaStream) {
+                            stream = mediaStream;
+                            videoElement.srcObject = mediaStream;
+                            
+                            // Change the take photo button to capture face
+                            takePhotoBtn.onclick = captureFacePhoto;
+                        })
+                        .catch(function(error) {
+                            console.error('Error accessing camera:', error);
+                            // Try without constraints if facingMode fails
+                            navigator.mediaDevices.getUserMedia({ video: true })
+                                .then(function(mediaStream) {
+                                    stream = mediaStream;
+                                    videoElement.srcObject = mediaStream;
+                                    takePhotoBtn.onclick = captureFacePhoto;
+                                })
+                                .catch(function(error) {
+                                    console.error('Error accessing camera:', error);
+                                    alert('Unable to access camera: ' + error.message);
+                                    cameraModal.hide();
+                                    resetFaceUI();
+                                });
+                        });
+                } else {
+                    alert('Your browser does not support camera access');
+                    resetFaceUI();
+                }
+            }
+            
+            function captureFacePhoto() {
+                const context = canvasElement.getContext('2d');
+                
+                // Set canvas dimensions to match video
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
+                
+                // Draw current video frame to canvas
+                context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+                
+                // Simulate face detection and capture
+                // In a real implementation, you would use a face detection API here
+                
+                // Update UI to show success
+                faceStatus.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Captured';
+                faceStatus.classList.remove('pending');
+                faceStatus.classList.add('captured');
+                
+                faceScore.textContent = '92%';
+                faceScore.classList.remove('d-none', 'score-low');
+                faceScore.classList.add('score-high');
+                
+                faceCaptureBtn.innerHTML = `
+                    <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
+                    <p class="text-center mb-0 text-success">Face Captured</p>
+                `;
+                
+                // Close camera and stop stream
+                cameraModal.hide();
+                stopCameraStream();
+                
+                // Reset take photo button
+                takePhotoBtn.onclick = takePhoto;
+            }
+            
+            function resetFaceUI() {
+                faceStatus.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Not Captured';
+                faceStatus.classList.remove('captured');
+                faceStatus.classList.add('pending');
+                faceScore.classList.add('d-none');
+                faceCaptureBtn.innerHTML = `
+                    <i class="bi bi-camera fs-1 text-muted mb-2"></i>
+                    <p class="text-center mb-0">Click to capture facial biometrics</p>
+                `;
+            }
+            
+            function captureFingerprintBiometrics() {
+                fingerprintCaptureBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Capturing...';
+                
+                // Use WebAuthn API for fingerprint authentication
+                if (window.PublicKeyCredential) {
+                    startWebAuthnRegistration();
+                } else {
+                    alert('WebAuthn is not supported in this browser. Please use a modern browser that supports biometric authentication.');
+                    resetFingerprintUI();
+                }
+            }
+            
+            function startWebAuthnRegistration() {
+                // Generate a random challenge (in a real app, this would come from the server)
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                
+                // Create credential creation options
+                const publicKeyCredentialCreationOptions = {
+                    challenge: challenge,
+                    rp: {
+                        name: "Lagos State eFarmerID",
+                        id: window.location.hostname
+                    },
+                    user: {
+                        id: new Uint8Array(16),
+                        name: "farmer@lagos.gov.ng",
+                        displayName: "Lagos State Farmer"
+                    },
+                    pubKeyCredParams: [
+                        {
+                            type: "public-key",
+                            alg: -7 // ES256
+                        },
+                        {
+                            type: "public-key",
+                            alg: -257 // RS256
+                        }
+                    ],
+                    timeout: 60000,
+                    attestation: "direct",
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform",
+                        userVerification: "required"
+                    }
+                };
+                
+                // Create credential using WebAuthn
+                navigator.credentials.create({
+                    publicKey: publicKeyCredentialCreationOptions
+                })
+                .then(credential => {
+                    // WebAuthn registration successful
+                    fingerprintStatus.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Captured';
+                    fingerprintStatus.classList.remove('pending');
+                    fingerprintStatus.classList.add('captured');
+                    
+                    fingerprintScore.textContent = '89%';
+                    fingerprintScore.classList.remove('d-none', 'score-low');
+                    fingerprintScore.classList.add('score-high');
+                    
+                    fingerprintCaptureBtn.innerHTML = `
+                        <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
+                        <p class="text-center mb-0 text-success">Fingerprint Captured</p>
+                    `;
+                    
+                    // In a real application, you would send the credential to your server for verification
+                    console.log('WebAuthn credential created:', credential);
+                })
+                .catch(error => {
+                    console.error('WebAuthn registration failed:', error);
+                    
+                    // Check if the error is due to user cancellation
+                    if (error.name === 'NotAllowedError') {
+                        alert('Fingerprint registration was cancelled or timed out.');
+                    } else {
+                        alert('Fingerprint registration failed: ' + error.message);
+                    }
+                    
+                    resetFingerprintUI();
+                });
+            }
+            
+            function resetFingerprintUI() {
+                fingerprintStatus.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Not Captured';
+                fingerprintStatus.classList.remove('captured');
+                fingerprintStatus.classList.add('pending');
+                fingerprintScore.classList.add('d-none');
+                fingerprintCaptureBtn.innerHTML = `
+                    <i class="bi bi-fingerprint fs-1 text-muted mb-2"></i>
+                    <p class="text-center mb-0">Click to capture fingerprint</p>
+                `;
+            }
+            
+            // Verification Summary
+            function updateVerificationSummary() {
+                document.getElementById('summaryName').textContent = 
+                    `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`;
+                document.getElementById('summaryId').textContent = document.getElementById('idNumber').value;
+                document.getElementById('summaryPhone').textContent = document.getElementById('phone').value;
+                document.getElementById('summaryLGA').textContent = document.getElementById('lga').value;
+                
+                document.getElementById('summaryFarmSize').textContent = 
+                    `${document.getElementById('farmSize').value} acres`;
+                document.getElementById('summaryCrop').textContent = 
+                    document.getElementById('primaryCrop').value;
+                
+                const faceDone = !faceStatus.classList.contains('pending');
+                const fingerprintDone = !fingerprintStatus.classList.contains('pending');
+                
+                if (faceDone && fingerprintDone) {
+                    document.getElementById('summaryBiometric').innerHTML = `
+                        <span class="badge bg-success me-1">Face: Captured</span>
+                        <span class="badge bg-success">Fingerprint: Captured</span>
+                    `;
+                    
+                    document.getElementById('biometricCheckStatus').textContent = 'Complete';
+                    document.getElementById('biometricCheckStatus').classList.remove('bg-danger');
+                    document.getElementById('biometricCheckStatus').classList.add('bg-success');
+                    document.getElementById('biometricCheckIcon').classList.remove('text-success', 'text-danger');
+                    document.getElementById('biometricCheckIcon').classList.add('text-success');
+                }
+                
+                if (latitudeInput.value && longitudeInput.value) {
+                    document.getElementById('locationCheckStatus').textContent = 'Captured';
+                    document.getElementById('locationCheckStatus').classList.remove('bg-danger');
+                    document.getElementById('locationCheckStatus').classList.add('bg-success');
+                    document.getElementById('locationCheckIcon').classList.remove('text-success', 'text-danger');
+                    document.getElementById('locationCheckIcon').classList.add('text-success');
+                }
+            }
+            
+            // Form Submission
+            function submitRegistration() {
+                if (!document.getElementById('declaration').checked) {
+                    alert('Please certify that the information is accurate');
+                    return;
+                }
+                
+                submitRegistrationBtn.disabled = true;
+                submitRegistrationBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+                
+                // Simulate form submission
+                setTimeout(() => {
+                    // Generate a Lagos-specific farmer ID
+                    const farmerId = 'F-LAG-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+                    
+                    // Show success message
+                    document.getElementById('successFarmerId').textContent = farmerId;
+                    successModal.show();
+                    
+                    // Reset submit button
+                    submitRegistrationBtn.disabled = false;
+                    submitRegistrationBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Submit Registration';
+                }, 2000);
+            }
+            
+            function resetForm() {
+                // Reset form fields
+                document.querySelector('form').reset();
+                
+                // Reset UI elements
+                currentStep = 1;
+                updateStepVisibility();
+                
+                // Reset photo
+                photoPreview.classList.add('d-none');
+                photoPlaceholder.classList.remove('d-none');
+                photoVerifiedBadge.classList.add('d-none');
+                
+                // Reset GPS
+                latitudeInput.value = '';
+                longitudeInput.value = '';
+                gpsTimestamp.textContent = 'Location will be captured from your device GPS';
+                gpsCaptureBadge.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i> Not Captured';
+                gpsCaptureBadge.classList.remove('bg-success');
+                gpsCaptureBadge.classList.add('bg-danger');
+                captureGpsBtn.innerHTML = '<i class="bi bi-geo-alt me-1"></i> Capture Location';
+                
+                gpsStatus.innerHTML = '<i class="bi bi-geo-alt-fill me-1"></i> GPS Inactive';
+                gpsStatus.classList.remove('active', 'gps-pulse');
+                gpsStatus.classList.add('inactive');
+                
+                // Reset biometrics
+                resetFaceUI();
+                resetFingerprintUI();
+                
+                // Enable submit button
+                submitRegistrationBtn.disabled = false;
+                submitRegistrationBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i> Submit Registration';
+            }
+        });
+    </script>
+</body>
+</html>
