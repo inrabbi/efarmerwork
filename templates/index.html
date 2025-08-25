@@ -366,6 +366,26 @@
             background-size: cover;
         }
         
+        .photo-thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #ddd;
+            margin: 5px;
+        }
+        
+        .fingerprint-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        
+        .fingerprint-item {
+            text-align: center;
+            margin: 0 10px;
+        }
+        
         @media (max-width: 768px) {
             .form-photo-preview {
                 width: 120px;
@@ -407,6 +427,15 @@
             .face-overlay {
                 width: 150px;
                 height: 200px;
+            }
+            
+            .fingerprint-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .fingerprint-item {
+                margin: 10px 0;
             }
         }
     </style>
@@ -469,17 +498,28 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4 mb-4">
-                                <label class="form-label required-field">Farmer Photo</label>
-                                <div class="form-photo-preview mb-2" id="photoPreviewContainer">
-                                    <i class="bi bi-camera fs-3 text-muted" id="photoPlaceholder"></i>
-                                    <img id="photoPreview" class="d-none">
-                                    <span class="id-verification-badge d-none" title="ID Verified" id="photoVerifiedBadge">
-                                        <i class="bi bi-check-lg"></i>
-                                    </span>
+                                <label class="form-label required-field">Farmer Photos</label>
+                                <div class="d-flex flex-wrap mb-3">
+                                    <div class="form-photo-preview mb-2 me-2" id="frontPhotoPreviewContainer" data-camera-type="front">
+                                        <i class="bi bi-camera fs-3 text-muted" id="frontPhotoPlaceholder"></i>
+                                        <img id="frontPhotoPreview" class="d-none">
+                                        <span class="id-verification-badge d-none" title="Front Photo">
+                                            <i class="bi bi-check-lg"></i>
+                                        </span>
+                                        <div class="photo-caption">Front</div>
+                                    </div>
+                                    <div class="form-photo-preview mb-2" id="backPhotoPreviewContainer" data-camera-type="back">
+                                        <i class="bi bi-camera fs-3 text-muted" id="backPhotoPlaceholder"></i>
+                                        <img id="backPhotoPreview" class="d-none">
+                                        <span class="id-verification-badge d-none" title="Back Photo">
+                                            <i class="bi bi-check-lg"></i>
+                                        </span>
+                                        <div class="photo-caption">Back</div>
+                                    </div>
                                 </div>
-                                <small class="text-muted d-block">Clear face photo required</small>
+                                <small class="text-muted d-block">Clear photos of front and back required</small>
                                 <button class="btn btn-sm btn-outline-primary mt-2 w-100" id="capturePhotoBtn">
-                                    <i class="bi bi-camera me-1"></i> Capture Photo
+                                    <i class="bi bi-camera me-1"></i> Capture Photos
                                 </button>
                             </div>
                             <div class="col-md-8">
@@ -734,16 +774,23 @@
                             <div class="col-md-6">
                                 <div class="biometric-section">
                                     <h6 class="section-title">Fingerprint Capture</h6>
-                                    <div class="biometric-capture" id="fingerprintCaptureBtn">
-                                        <i class="bi bi-fingerprint fs-1 text-muted mb-2"></i>
-                                        <p class="text-center mb-0">Click to capture fingerprint</p>
-                                        <div class="capture-feedback text-success small"></div>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <span class="biometric-status pending" id="fingerprintStatus">
-                                            <i class="bi bi-exclamation-triangle-fill me-1"></i> Not Captured
-                                        </span>
-                                        <div class="verification-score score-low d-none" id="fingerprintScore">0%</div>
+                                    <div class="fingerprint-container">
+                                        <div class="fingerprint-item">
+                                            <div class="fingerprint-preview mb-2" id="rightThumbCapture">
+                                                <i class="bi bi-fingerprint fs-3 text-muted"></i>
+                                            </div>
+                                            <span class="biometric-status pending" id="rightThumbStatus">
+                                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Right Thumb
+                                            </span>
+                                        </div>
+                                        <div class="fingerprint-item">
+                                            <div class="fingerprint-preview mb-2" id="leftThumbCapture">
+                                                <i class="bi bi-fingerprint fs-3 text-muted"></i>
+                                            </div>
+                                            <span class="biometric-status pending" id="leftThumbStatus">
+                                                <i class="bi bi-exclamation-triangle-fill me-1"></i> Left Thumb
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -799,8 +846,12 @@
                                             <td id="summaryCrop">-</td>
                                         </tr>
                                         <tr>
-                                            <th>Biometric Status</th>
-                                            <td id="summaryBiometric">-</td>
+                                            <th>Photos Captured</th>
+                                            <td id="summaryPhotos">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Fingerprints Captured</th>
+                                            <td id="summaryFingerprints">-</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -826,10 +877,17 @@
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <i class="bi bi-check-circle-fill text-success me-2" id="biometricCheckIcon"></i>
-                                        Biometric Verification
+                                        <i class="bi bi-check-circle-fill text-success me-2" id="photosCheckIcon"></i>
+                                        Photos Captured
                                     </div>
-                                    <span class="badge bg-danger" id="biometricCheckStatus">Not Complete</span>
+                                    <span class="badge bg-danger" id="photosCheckStatus">Incomplete</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <i class="bi bi-check-circle-fill text-success me-2" id="fingerprintsCheckIcon"></i>
+                                        Fingerprints Captured
+                                    </div>
+                                    <span class="badge bg-danger" id="fingerprintsCheckStatus">Incomplete</span>
                                 </div>
                             </div>
                         </div>
@@ -869,7 +927,7 @@
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="cameraModalLabel">Capture Photo</h5>
+                    <h5 class="modal-title" id="cameraModalLabel">Capture Photo - <span id="cameraTypeLabel">Front</span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-0">
@@ -880,10 +938,41 @@
                         <div class="face-guide">Position your face within the frame</div>
                     </div>
                     <div class="camera-controls">
+                        <button class="btn btn-outline-light me-2" id="switchCameraBtn">
+                            <i class="bi bi-arrow-left-right"></i> Switch Camera
+                        </button>
                         <div class="capture-btn" id="takePhotoBtn">
                             <i class="bi bi-circle-fill text-white fs-3"></i>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fingerprint Modal -->
+    <div class="modal fade" id="fingerprintModal" tabindex="-1" aria-labelledby="fingerprintModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fingerprintModalLabel">Capture <span id="fingerprintTypeLabel">Right Thumb</span> Fingerprint</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="fingerprint-preview mx-auto mb-3" style="width: 120px; height: 120px;">
+                        <i class="bi bi-fingerprint fs-1 text-muted"></i>
+                    </div>
+                    <p>Please place your <span id="fingerprintInstruction">right thumb</span> on the fingerprint sensor</p>
+                    <div class="progress mb-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i> Ensure your thumb is clean and dry for accurate capture
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-lagos" id="simulateFingerprintBtn">Simulate Capture</button>
                 </div>
             </div>
         </div>
@@ -938,27 +1027,53 @@
             const longitudeInput = document.getElementById('longitude');
             const gpsTimestamp = document.getElementById('gpsTimestamp');
             const capturePhotoBtn = document.getElementById('capturePhotoBtn');
-            const photoPreviewContainer = document.getElementById('photoPreviewContainer');
-            const photoPreview = document.getElementById('photoPreview');
-            const photoPlaceholder = document.getElementById('photoPlaceholder');
-            const photoVerifiedBadge = document.getElementById('photoVerifiedBadge');
+            const frontPhotoPreviewContainer = document.getElementById('frontPhotoPreviewContainer');
+            const frontPhotoPreview = document.getElementById('frontPhotoPreview');
+            const frontPhotoPlaceholder = document.getElementById('frontPhotoPlaceholder');
+            const backPhotoPreviewContainer = document.getElementById('backPhotoPreviewContainer');
+            const backPhotoPreview = document.getElementById('backPhotoPreview');
+            const backPhotoPlaceholder = document.getElementById('backPhotoPlaceholder');
             const faceCaptureBtn = document.getElementById('faceCaptureBtn');
-            const fingerprintCaptureBtn = document.getElementById('fingerprintCaptureBtn');
+            const rightThumbCapture = document.getElementById('rightThumbCapture');
+            const leftThumbCapture = document.getElementById('leftThumbCapture');
+            const rightThumbStatus = document.getElementById('rightThumbStatus');
+            const leftThumbStatus = document.getElementById('leftThumbStatus');
             const faceStatus = document.getElementById('faceStatus');
-            const fingerprintStatus = document.getElementById('fingerprintStatus');
             const faceScore = document.getElementById('faceScore');
-            const fingerprintScore = document.getElementById('fingerprintScore');
             const submitRegistrationBtn = document.getElementById('submitRegistrationBtn');
             const registerAnotherBtn = document.getElementById('registerAnotherBtn');
             
             // Camera elements
             const cameraModal = new bootstrap.Modal(document.getElementById('cameraModal'));
+            const cameraTypeLabel = document.getElementById('cameraTypeLabel');
             const videoElement = document.getElementById('videoElement');
             const canvasElement = document.getElementById('canvasElement');
             const takePhotoBtn = document.getElementById('takePhotoBtn');
+            const switchCameraBtn = document.getElementById('switchCameraBtn');
+            
+            // Fingerprint elements
+            const fingerprintModal = new bootstrap.Modal(document.getElementById('fingerprintModal'));
+            const fingerprintTypeLabel = document.getElementById('fingerprintTypeLabel');
+            const fingerprintInstruction = document.getElementById('fingerprintInstruction');
+            const simulateFingerprintBtn = document.getElementById('simulateFingerprintBtn');
             
             // Success modal
             const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+            
+            // Biometric data storage
+            const biometricData = {
+                frontPhoto: null,
+                backPhoto: null,
+                faceData: null,
+                rightThumb: null,
+                leftThumb: null
+            };
+            
+            let currentCameraType = 'front';
+            let currentFingerprintType = 'rightThumb';
+            let stream = null;
+            let availableCameras = [];
+            let currentCameraIndex = 0;
             
             // Initialize steps
             updateStepVisibility();
@@ -967,10 +1082,15 @@
             prevStepBtn.addEventListener('click', goToPreviousStep);
             nextStepBtn.addEventListener('click', goToNextStep);
             captureGpsBtn.addEventListener('click', captureGPSLocation);
-            capturePhotoBtn.addEventListener('click', openCamera);
+            capturePhotoBtn.addEventListener('click', openCameraForFrontPhoto);
+            frontPhotoPreviewContainer.addEventListener('click', () => openCameraForPhoto('front'));
+            backPhotoPreviewContainer.addEventListener('click', () => openCameraForPhoto('back'));
             takePhotoBtn.addEventListener('click', takePhoto);
+            switchCameraBtn.addEventListener('click', switchCamera);
             faceCaptureBtn.addEventListener('click', captureFaceBiometrics);
-            fingerprintCaptureBtn.addEventListener('click', captureFingerprintBiometrics);
+            rightThumbCapture.addEventListener('click', () => openFingerprintModal('rightThumb'));
+            leftThumbCapture.addEventListener('click', () => openFingerprintModal('leftThumb'));
+            simulateFingerprintBtn.addEventListener('click', simulateFingerprintCapture);
             submitRegistrationBtn.addEventListener('click', submitRegistration);
             registerAnotherBtn.addEventListener('click', resetForm);
             
@@ -1035,8 +1155,8 @@
                         return false;
                     }
                     
-                    if (photoPreview.classList.contains('d-none')) {
-                        alert('Please capture a photo of the farmer');
+                    if (!biometricData.frontPhoto || !biometricData.backPhoto) {
+                        alert('Please capture both front and back photos');
                         return false;
                     }
                 }
@@ -1068,13 +1188,13 @@
                 
                 if (currentStep === 4) {
                     // Validate biometrics
-                    if (faceStatus.classList.contains('pending')) {
+                    if (!biometricData.faceData) {
                         alert('Please capture face biometrics');
                         return false;
                     }
                     
-                    if (fingerprintStatus.classList.contains('pending')) {
-                        alert('Please capture fingerprint biometrics');
+                    if (!biometricData.rightThumb || !biometricData.leftThumb) {
+                        alert('Please capture both thumb fingerprints');
                         return false;
                     }
                     
@@ -1139,43 +1259,77 @@
             }
             
             // Camera Functions
-            let stream = null;
+            function openCameraForFrontPhoto() {
+                openCameraForPhoto('front');
+            }
             
-            function openCamera() {
+            function openCameraForPhoto(cameraType) {
+                currentCameraType = cameraType;
+                cameraTypeLabel.textContent = cameraType.charAt(0).toUpperCase() + cameraType.slice(1);
                 cameraModal.show();
                 
                 // Access the device camera
                 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    // Try to get front-facing camera
-                    navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            facingMode: 'user',
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        },
-                        audio: false 
-                    })
-                        .then(function(mediaStream) {
-                            stream = mediaStream;
-                            videoElement.srcObject = mediaStream;
+                    // Get available cameras
+                    navigator.mediaDevices.enumerateDevices()
+                        .then(devices => {
+                            availableCameras = devices.filter(device => device.kind === 'videoinput');
+                            startCamera();
                         })
-                        .catch(function(error) {
-                            console.error('Error accessing camera:', error);
-                            // Try without constraints if facingMode fails
-                            navigator.mediaDevices.getUserMedia({ video: true })
-                                .then(function(mediaStream) {
-                                    stream = mediaStream;
-                                    videoElement.srcObject = mediaStream;
-                                })
-                                .catch(function(error) {
-                                    console.error('Error accessing camera:', error);
-                                    alert('Unable to access camera: ' + error.message);
-                                    cameraModal.hide();
-                                });
+                        .catch(error => {
+                            console.error('Error enumerating devices:', error);
+                            startCamera();
                         });
                 } else {
                     alert('Your browser does not support camera access');
                 }
+            }
+            
+            function startCamera() {
+                stopCameraStream();
+                
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                };
+                
+                // If we have multiple cameras, specify which one to use
+                if (availableCameras.length > 1) {
+                    constraints.video.facingMode = currentCameraType === 'front' ? 'user' : 'environment';
+                }
+                
+                navigator.mediaDevices.getUserMedia(constraints)
+                    .then(function(mediaStream) {
+                        stream = mediaStream;
+                        videoElement.srcObject = mediaStream;
+                    })
+                    .catch(function(error) {
+                        console.error('Error accessing camera:', error);
+                        // Try without constraints if facingMode fails
+                        navigator.mediaDevices.getUserMedia({ video: true })
+                            .then(function(mediaStream) {
+                                stream = mediaStream;
+                                videoElement.srcObject = mediaStream;
+                            })
+                            .catch(function(error) {
+                                console.error('Error accessing camera:', error);
+                                alert('Unable to access camera: ' + error.message);
+                                cameraModal.hide();
+                            });
+                    });
+            }
+            
+            function switchCamera() {
+                if (availableCameras.length < 2) {
+                    alert('Only one camera is available on this device');
+                    return;
+                }
+                
+                currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+                startCamera();
             }
             
             function takePhoto() {
@@ -1191,15 +1345,32 @@
                 // Convert canvas to data URL
                 const imageData = canvasElement.toDataURL('image/png');
                 
-                // Update preview
-                photoPreview.src = imageData;
-                photoPreview.classList.remove('d-none');
-                photoPlaceholder.classList.add('d-none');
-                photoVerifiedBadge.classList.remove('d-none');
+                // Store based on camera type
+                biometricData[currentCameraType + 'Photo'] = imageData;
                 
-                // Close camera and stop stream
-                cameraModal.hide();
-                stopCameraStream();
+                // Update preview
+                if (currentCameraType === 'front') {
+                    frontPhotoPreview.src = imageData;
+                    frontPhotoPreview.classList.remove('d-none');
+                    frontPhotoPlaceholder.classList.add('d-none');
+                } else {
+                    backPhotoPreview.src = imageData;
+                    backPhotoPreview.classList.remove('d-none');
+                    backPhotoPlaceholder.classList.add('d-none');
+                }
+                
+                // Close camera if both photos are captured, otherwise switch to other camera
+                if ((currentCameraType === 'front' && !biometricData.backPhoto) || 
+                    (currentCameraType === 'back' && !biometricData.frontPhoto)) {
+                    // Switch to the other camera
+                    currentCameraType = currentCameraType === 'front' ? 'back' : 'front';
+                    cameraTypeLabel.textContent = currentCameraType.charAt(0).toUpperCase() + currentCameraType.slice(1);
+                    startCamera();
+                } else {
+                    // Both photos captured, close camera
+                    cameraModal.hide();
+                    stopCameraStream();
+                }
             }
             
             function stopCameraStream() {
@@ -1223,6 +1394,8 @@
             }
             
             function openCameraForFace() {
+                currentCameraType = 'face';
+                cameraTypeLabel.textContent = 'Face';
                 cameraModal.show();
                 
                 // Access the device camera
@@ -1239,9 +1412,6 @@
                         .then(function(mediaStream) {
                             stream = mediaStream;
                             videoElement.srcObject = mediaStream;
-                            
-                            // Change the take photo button to capture face
-                            takePhotoBtn.onclick = captureFacePhoto;
                         })
                         .catch(function(error) {
                             console.error('Error accessing camera:', error);
@@ -1250,7 +1420,6 @@
                                 .then(function(mediaStream) {
                                     stream = mediaStream;
                                     videoElement.srcObject = mediaStream;
-                                    takePhotoBtn.onclick = captureFacePhoto;
                                 })
                                 .catch(function(error) {
                                     console.error('Error accessing camera:', error);
@@ -1275,8 +1444,11 @@
                 // Draw current video frame to canvas
                 context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
                 
-                // Simulate face detection and capture
-                // In a real implementation, you would use a face detection API here
+                // Convert canvas to data URL
+                const imageData = canvasElement.toDataURL('image/png');
+                
+                // Store face data
+                biometricData.faceData = imageData;
                 
                 // Update UI to show success
                 faceStatus.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Captured';
@@ -1295,9 +1467,6 @@
                 // Close camera and stop stream
                 cameraModal.hide();
                 stopCameraStream();
-                
-                // Reset take photo button
-                takePhotoBtn.onclick = takePhoto;
             }
             
             function resetFaceUI() {
@@ -1311,98 +1480,53 @@
                 `;
             }
             
-            function captureFingerprintBiometrics() {
-                fingerprintCaptureBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Capturing...';
-                
-                // Use WebAuthn API for fingerprint authentication
-                if (window.PublicKeyCredential) {
-                    startWebAuthnRegistration();
-                } else {
-                    alert('WebAuthn is not supported in this browser. Please use a modern browser that supports biometric authentication.');
-                    resetFingerprintUI();
-                }
+            // Fingerprint Functions
+            function openFingerprintModal(fingerprintType) {
+                currentFingerprintType = fingerprintType;
+                const fingerprintName = fingerprintType === 'rightThumb' ? 'Right Thumb' : 'Left Thumb';
+                fingerprintTypeLabel.textContent = fingerprintName;
+                fingerprintInstruction.textContent = fingerprintName.toLowerCase();
+                fingerprintModal.show();
             }
             
-            function startWebAuthnRegistration() {
-                // Generate a random challenge (in a real app, this would come from the server)
-                const challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
+            function simulateFingerprintCapture() {
+                // Simulate fingerprint capture process
+                const progressBar = document.querySelector('#fingerprintModal .progress-bar');
+                let progress = 0;
                 
-                // Create credential creation options
-                const publicKeyCredentialCreationOptions = {
-                    challenge: challenge,
-                    rp: {
-                        name: "Lagos State eFarmerID",
-                        id: window.location.hostname
-                    },
-                    user: {
-                        id: new Uint8Array(16),
-                        name: "farmer@lagos.gov.ng",
-                        displayName: "Lagos State Farmer"
-                    },
-                    pubKeyCredParams: [
-                        {
-                            type: "public-key",
-                            alg: -7 // ES256
-                        },
-                        {
-                            type: "public-key",
-                            alg: -257 // RS256
+                const interval = setInterval(() => {
+                    progress += 10;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        
+                        // Generate simulated fingerprint data
+                        const fingerprintData = {
+                            type: currentFingerprintType,
+                            timestamp: new Date().toISOString(),
+                            quality: Math.floor(Math.random() * 100) + 1,
+                            data: 'simulated-fingerprint-data-' + Math.random().toString(36).substring(2)
+                        };
+                        
+                        // Store fingerprint data
+                        biometricData[currentFingerprintType] = fingerprintData;
+                        
+                        // Update UI
+                        if (currentFingerprintType === 'rightThumb') {
+                            rightThumbStatus.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Captured';
+                            rightThumbStatus.classList.remove('pending');
+                            rightThumbStatus.classList.add('captured');
+                        } else {
+                            leftThumbStatus.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Captured';
+                            leftThumbStatus.classList.remove('pending');
+                            leftThumbStatus.classList.add('captured');
                         }
-                    ],
-                    timeout: 60000,
-                    attestation: "direct",
-                    authenticatorSelection: {
-                        authenticatorAttachment: "platform",
-                        userVerification: "required"
+                        
+                        // Close modal
+                        fingerprintModal.hide();
                     }
-                };
-                
-                // Create credential using WebAuthn
-                navigator.credentials.create({
-                    publicKey: publicKeyCredentialCreationOptions
-                })
-                .then(credential => {
-                    // WebAuthn registration successful
-                    fingerprintStatus.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Captured';
-                    fingerprintStatus.classList.remove('pending');
-                    fingerprintStatus.classList.add('captured');
-                    
-                    fingerprintScore.textContent = '89%';
-                    fingerprintScore.classList.remove('d-none', 'score-low');
-                    fingerprintScore.classList.add('score-high');
-                    
-                    fingerprintCaptureBtn.innerHTML = `
-                        <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
-                        <p class="text-center mb-0 text-success">Fingerprint Captured</p>
-                    `;
-                    
-                    // In a real application, you would send the credential to your server for verification
-                    console.log('WebAuthn credential created:', credential);
-                })
-                .catch(error => {
-                    console.error('WebAuthn registration failed:', error);
-                    
-                    // Check if the error is due to user cancellation
-                    if (error.name === 'NotAllowedError') {
-                        alert('Fingerprint registration was cancelled or timed out.');
-                    } else {
-                        alert('Fingerprint registration failed: ' + error.message);
-                    }
-                    
-                    resetFingerprintUI();
-                });
-            }
-            
-            function resetFingerprintUI() {
-                fingerprintStatus.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Not Captured';
-                fingerprintStatus.classList.remove('captured');
-                fingerprintStatus.classList.add('pending');
-                fingerprintScore.classList.add('d-none');
-                fingerprintCaptureBtn.innerHTML = `
-                    <i class="bi bi-fingerprint fs-1 text-muted mb-2"></i>
-                    <p class="text-center mb-0">Click to capture fingerprint</p>
-                `;
+                }, 200);
             }
             
             // Verification Summary
@@ -1418,20 +1542,28 @@
                 document.getElementById('summaryCrop').textContent = 
                     document.getElementById('primaryCrop').value;
                 
-                const faceDone = !faceStatus.classList.contains('pending');
-                const fingerprintDone = !fingerprintStatus.classList.contains('pending');
+                // Update photos status
+                const photosCaptured = [biometricData.frontPhoto, biometricData.backPhoto].filter(Boolean).length;
+                document.getElementById('summaryPhotos').textContent = `${photosCaptured}/2 photos`;
                 
-                if (faceDone && fingerprintDone) {
-                    document.getElementById('summaryBiometric').innerHTML = `
-                        <span class="badge bg-success me-1">Face: Captured</span>
-                        <span class="badge bg-success">Fingerprint: Captured</span>
-                    `;
-                    
-                    document.getElementById('biometricCheckStatus').textContent = 'Complete';
-                    document.getElementById('biometricCheckStatus').classList.remove('bg-danger');
-                    document.getElementById('biometricCheckStatus').classList.add('bg-success');
-                    document.getElementById('biometricCheckIcon').classList.remove('text-success', 'text-danger');
-                    document.getElementById('biometricCheckIcon').classList.add('text-success');
+                if (photosCaptured === 2) {
+                    document.getElementById('photosCheckStatus').textContent = 'Complete';
+                    document.getElementById('photosCheckStatus').classList.remove('bg-danger');
+                    document.getElementById('photosCheckStatus').classList.add('bg-success');
+                    document.getElementById('photosCheckIcon').classList.remove('text-success', 'text-danger');
+                    document.getElementById('photosCheckIcon').classList.add('text-success');
+                }
+                
+                // Update fingerprints status
+                const fingerprintsCaptured = [biometricData.rightThumb, biometricData.leftThumb].filter(Boolean).length;
+                document.getElementById('summaryFingerprints').textContent = `${fingerprintsCaptured}/2 fingerprints`;
+                
+                if (fingerprintsCaptured === 2) {
+                    document.getElementById('fingerprintsCheckStatus').textContent = 'Complete';
+                    document.getElementById('fingerprintsCheckStatus').classList.remove('bg-danger');
+                    document.getElementById('fingerprintsCheckStatus').classList.add('bg-success');
+                    document.getElementById('fingerprintsCheckIcon').classList.remove('text-success', 'text-danger');
+                    document.getElementById('fingerprintsCheckIcon').classList.add('text-success');
                 }
                 
                 if (latitudeInput.value && longitudeInput.value) {
@@ -1453,7 +1585,36 @@
                 submitRegistrationBtn.disabled = true;
                 submitRegistrationBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
                 
-                // Simulate form submission
+                // Collect all form data
+                const formData = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    idNumber: document.getElementById('idNumber').value,
+                    dob: document.getElementById('dob').value,
+                    gender: document.getElementById('gender').value,
+                    phone: document.getElementById('phone').value,
+                    lga: document.getElementById('lga').value,
+                    ward: document.getElementById('ward').value,
+                    address: document.getElementById('address').value,
+                    farmSize: document.getElementById('farmSize').value,
+                    primaryCrop: document.getElementById('primaryCrop').value,
+                    secondaryCrop: document.getElementById('secondaryCrop').value,
+                    livestock: Array.from(document.getElementById('livestock').selectedOptions).map(opt => opt.value),
+                    farmingMethods: Array.from(document.querySelectorAll('input[name="farmingMethods"]:checked')).map(cb => cb.value),
+                    additionalInfo: document.getElementById('additionalInfo').value,
+                    location: {
+                        latitude: latitudeInput.value,
+                        longitude: longitudeInput.value,
+                        timestamp: gpsTimestamp.textContent.replace('Captured at ', '')
+                    },
+                    biometricData: biometricData,
+                    registrationDate: new Date().toISOString()
+                };
+                
+                // In a real application, you would send this data to your server
+                console.log('Form data to be submitted:', formData);
+                
+                // Simulate API call
                 setTimeout(() => {
                     // Generate a Lagos-specific farmer ID
                     const farmerId = 'F-LAG-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
@@ -1476,10 +1637,11 @@
                 currentStep = 1;
                 updateStepVisibility();
                 
-                // Reset photo
-                photoPreview.classList.add('d-none');
-                photoPlaceholder.classList.remove('d-none');
-                photoVerifiedBadge.classList.add('d-none');
+                // Reset photos
+                frontPhotoPreview.classList.add('d-none');
+                frontPhotoPlaceholder.classList.remove('d-none');
+                backPhotoPreview.classList.add('d-none');
+                backPhotoPlaceholder.classList.remove('d-none');
                 
                 // Reset GPS
                 latitudeInput.value = '';
@@ -1496,7 +1658,17 @@
                 
                 // Reset biometrics
                 resetFaceUI();
-                resetFingerprintUI();
+                rightThumbStatus.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Right Thumb';
+                rightThumbStatus.classList.remove('captured');
+                rightThumbStatus.classList.add('pending');
+                leftThumbStatus.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Left Thumb';
+                leftThumbStatus.classList.remove('captured');
+                leftThumbStatus.classList.add('pending');
+                
+                // Reset biometric data storage
+                for (let key in biometricData) {
+                    biometricData[key] = null;
+                }
                 
                 // Enable submit button
                 submitRegistrationBtn.disabled = false;
